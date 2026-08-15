@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Shield01Icon, Cancel01Icon, CheckmarkBadge01Icon, Airplane01Icon, Analytics01Icon } from "@hugeicons/core-free-icons";
 import { motion } from 'framer-motion';
+import { usePrivy } from '@privy-io/react-auth';
 
 export default function Dashboard() {
   const [flightNumber, setFlightNumber] = useState("");
@@ -15,6 +16,8 @@ export default function Dashboard() {
     { id: 1, flight: "DELAY404", date: "2026-08-15", premium: 15, payout: 150, status: "claimed" }
   ]);
   const [claimingId, setClaimingId] = useState<number | null>(null);
+
+  const { login, authenticated } = usePrivy();
 
   // Dynamic Risk Analysis Effect
   useEffect(() => {
@@ -36,6 +39,10 @@ export default function Dashboard() {
   }, [flightNumber]);
 
   const handlePurchase = async () => {
+    if (!authenticated) {
+      login();
+      return;
+    }
     if (!flightNumber || !flightDate || !riskData) return;
     setIsPurchasing(true);
     
