@@ -1,33 +1,34 @@
-import Dashboard from './components/Dashboard';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Airplane01Icon } from "@hugeicons/core-free-icons";
+import Dashboard from './components/Dashboard';
+import LandingPage from './components/LandingPage';
 
 function App() {
   return (
-    <div className="app-container">
-      <div className="liquid-bg"></div>
+    <Router>
+      <div className="bg-blobs">
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+      </div>
       
-      <header className="glass-header">
-        <div className="logo">
-          <HugeiconsIcon icon={Airplane01Icon} size={28} />
-          <span>AeroSure</span>
+      <nav className="navbar">
+        <Link to="/" className="nav-logo">
+          <HugeiconsIcon icon={Airplane01Icon} size={28} color="var(--brand)" />
+          AeroSure
+        </Link>
+        <div className="nav-links">
+          <Link to="/dashboard">Insurance</Link>
+          <a href="#">Whitepaper</a>
         </div>
-        <nav>
-          <a href="#" className="active">Insurance</a>
-          <a href="#">My Policies</a>
-          <a href="#">Docs</a>
-        </nav>
-        <button className="btn-connect">Connect Wallet</button>
-      </header>
+        <button className="clay-btn">Connect Wallet</button>
+      </nav>
 
-      <main>
-        <div className="hero">
-          <h1>Parametric Flight Insurance</h1>
-          <p>Powered by GenLayer Intelligent Contracts. Automated payouts with zero human intervention.</p>
-        </div>
-        <Dashboard />
-      </main>
-    </div>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
