@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Airplane01Icon, Shield01Icon, Analytics01Icon, ArrowRight01Icon, Tick01Icon, ZapIcon } from "@hugeicons/core-free-icons";
@@ -11,7 +11,7 @@ const letterVariants = {
     opacity: 1, 
     y: 0, 
     rotateX: 0,
-    transition: { type: "spring", damping: 12, stiffness: 100 }
+    transition: { damping: 12, stiffness: 100 }
   }
 };
 
