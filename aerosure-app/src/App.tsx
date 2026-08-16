@@ -27,7 +27,7 @@ function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>
                 <HugeiconsIcon icon={UserCircleIcon} size={18} />
-                {user?.email?.address || user?.wallet?.address.slice(0, 6) + '...' + user?.wallet?.address.slice(-4) || 'User'}
+                {user?.email?.address || (user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 'User')}
               </div>
               <Link to="/dashboard" className="saas-btn primary" style={{ padding: '0.5rem 1rem' }}>Dashboard</Link>
               <button className="saas-btn" onClick={logout} style={{ padding: '0.5rem' }}>
