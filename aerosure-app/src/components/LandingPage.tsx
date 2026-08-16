@@ -2,9 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
-  Airplane01Icon, 
-  Shield01Icon, 
-  Analytics01Icon, 
+  Shield01Icon,
   ArrowRight01Icon, 
   Tick01Icon, 
   ZapIcon,
@@ -15,7 +13,7 @@ import {
 
 const fadeUpVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
 
 export default function LandingPage() {
