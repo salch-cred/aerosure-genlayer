@@ -4,16 +4,13 @@ import { Airplane01Icon, Logout01Icon, UserCircleIcon } from "@hugeicons/core-fr
 import { usePrivy } from '@privy-io/react-auth';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import Docs from './components/Docs';
 
 function App() {
   const { login, logout, authenticated, user } = usePrivy();
 
   return (
     <Router>
-      <div className="bg-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-      </div>
       
       <nav className="navbar">
         <Link to="/" className="nav-logo">
@@ -21,22 +18,24 @@ function App() {
           AeroSure
         </Link>
         <div className="nav-links">
-          <Link to="/dashboard">Insurance</Link>
-          <a href="#">Whitepaper</a>
+          <Link to="/features">Features</Link>
+          <Link to="/pricing">Pricing</Link>
+          <Link to="/docs">Documentation</Link>
         </div>
         <div>
           {authenticated ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, color: 'var(--brand)' }}>
-                <HugeiconsIcon icon={UserCircleIcon} size={20} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                <HugeiconsIcon icon={UserCircleIcon} size={18} />
                 {user?.email?.address || user?.wallet?.address.slice(0, 6) + '...' + user?.wallet?.address.slice(-4) || 'User'}
               </div>
-              <button className="clay-btn" onClick={logout} style={{ padding: '0.5rem 1rem' }}>
+              <Link to="/dashboard" className="saas-btn primary" style={{ padding: '0.5rem 1rem' }}>Dashboard</Link>
+              <button className="saas-btn" onClick={logout} style={{ padding: '0.5rem' }}>
                 <HugeiconsIcon icon={Logout01Icon} size={18} />
               </button>
             </div>
           ) : (
-            <button className="clay-btn primary" onClick={login}>Login / Connect Wallet</button>
+            <button className="saas-btn primary" onClick={login}>Get Started</button>
           )}
         </div>
       </nav>
@@ -44,6 +43,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/docs" element={<Docs />} />
       </Routes>
     </Router>
   );

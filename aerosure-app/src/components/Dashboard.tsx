@@ -87,7 +87,7 @@ export default function Dashboard() {
 
       <div className="dashboard-grid">
         <motion.div 
-          className="clay-card"
+          className="saas-card"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -100,7 +100,7 @@ export default function Dashboard() {
             <label className="input-label">Flight Number</label>
             <input 
               type="text" 
-              className="clay-input"
+              className="saas-input"
               placeholder="e.g. AA123 (Try DELAY404)" 
               value={flightNumber}
               onChange={(e) => setFlightNumber(e.target.value)}
@@ -111,7 +111,7 @@ export default function Dashboard() {
             <label className="input-label">Flight Date</label>
             <input 
               type="date" 
-              className="clay-input"
+              className="saas-input"
               value={flightDate}
               onChange={(e) => setFlightDate(e.target.value)}
             />
@@ -142,7 +142,7 @@ export default function Dashboard() {
           )}
           
           <button 
-            className="clay-btn primary" 
+            className="saas-btn primary" 
             onClick={handlePurchase}
             disabled={isPurchasing || !flightNumber || !flightDate || !riskData}
             style={{ width: '100%', marginTop: '2rem', justifyContent: 'center' }}
@@ -152,7 +152,7 @@ export default function Dashboard() {
         </motion.div>
 
         <motion.div 
-          className="clay-card"
+          className="saas-card"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -179,7 +179,7 @@ export default function Dashboard() {
                 
                 {policy.status === 'active' && (
                   <button 
-                    className="clay-btn"
+                    className="saas-btn"
                     onClick={() => handleClaim(policy.id, policy.flight)}
                     disabled={claimingId === policy.id}
                     style={{ marginTop: '0.5rem', justifyContent: 'center', width: '100%' }}
