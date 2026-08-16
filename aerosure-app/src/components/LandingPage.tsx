@@ -3,12 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
   Shield01Icon,
-  ArrowRight01Icon, 
-  Tick01Icon, 
-  ZapIcon,
-  GlobalIcon,
-  Blockchain03Icon,
-  SmartPhone01Icon
+  CheckmarkBadge01Icon, 
+  Airplane01Icon,
+  Analytics01Icon,
+  UserCircleIcon
 } from "@hugeicons/core-free-icons";
 
 const fadeUpVariants = {
@@ -58,7 +56,7 @@ export default function LandingPage() {
           transition={{ delay: 0.3 }}
         >
           <button className="saas-btn primary" onClick={() => navigate('/dashboard')}>
-            Start Free Trial <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+            Start Free Trial <HugeiconsIcon icon={Airplane01Icon} size={18} />
           </button>
           <button className="saas-btn" onClick={() => navigate('/docs')}>
             Read Documentation
@@ -74,10 +72,10 @@ export default function LandingPage() {
         viewport={{ once: true }}
       >
         <div style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <HugeiconsIcon icon={GlobalIcon} size={24} /> GenLayer
+          <HugeiconsIcon icon={Analytics01Icon} size={24} /> GenLayer
         </div>
         <div style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <HugeiconsIcon icon={Blockchain03Icon} size={24} /> Wagmi
+          <HugeiconsIcon icon={UserCircleIcon} size={24} /> Wagmi
         </div>
         <div style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <HugeiconsIcon icon={Shield01Icon} size={24} /> Privy
@@ -100,7 +98,7 @@ export default function LandingPage() {
             variants={fadeUpVariants}
           >
             <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.03)', width: 'fit-content', borderRadius: '12px', marginBottom: '2rem' }}>
-              <HugeiconsIcon icon={ZapIcon} size={32} color="var(--text-main)" />
+              <HugeiconsIcon icon={Analytics01Icon} size={32} color="var(--text-main)" />
             </div>
             <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Instant Adjudication via LLM Consensus</h3>
             <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: '500px' }}>
@@ -118,7 +116,7 @@ export default function LandingPage() {
             variants={fadeUpVariants}
           >
             <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.03)', width: 'fit-content', borderRadius: '12px', marginBottom: '2rem' }}>
-              <HugeiconsIcon icon={SmartPhone01Icon} size={32} color="var(--text-main)" />
+              <HugeiconsIcon icon={UserCircleIcon} size={32} color="var(--text-main)" />
             </div>
             <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Frictionless Onboarding</h3>
             <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -141,8 +139,8 @@ export default function LandingPage() {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>For testing on GenLayer Testnet.</p>
             
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={Tick01Icon} size={18} /> 1,000 requests/mo</li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={Tick01Icon} size={18} /> Community Support</li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} /> 1,000 requests/mo</li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} /> Community Support</li>
             </ul>
             <button className="saas-btn" style={{ width: '100%', justifyContent: 'center' }}>Get Started</button>
           </div>
@@ -153,9 +151,9 @@ export default function LandingPage() {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>For airlines and large travel agencies.</p>
             
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={Tick01Icon} size={18} /> Unlimited requests</li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={Tick01Icon} size={18} /> Dedicated Node Infrastructure</li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={Tick01Icon} size={18} /> 24/7 SLA Support</li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} /> Unlimited requests</li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} /> Dedicated Node Infrastructure</li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} /> 24/7 SLA Support</li>
             </ul>
             <button className="saas-btn primary" style={{ width: '100%', justifyContent: 'center' }}>Contact Sales</button>
           </div>
