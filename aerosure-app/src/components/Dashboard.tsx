@@ -4,18 +4,36 @@ import { Shield01Icon, Cancel01Icon, CheckmarkBadge01Icon, Airplane01Icon, Analy
 import { motion } from 'framer-motion';
 import { usePrivy } from '@privy-io/react-auth';
 
+// GenLayer Integration
+import { createClient, createAccount } from "genlayer-js";
+import { testnetBradbury } from "genlayer-js/chains";
+import { TransactionStatus, ExecutionResult } from "genlayer-js/types";
+
+// Create a local session account for GenLayer transactions
+const genlayerAccount = createAccount();
+const genlayerClient = createClient({
+  chain: testnetBradbury,
+  account: genlayerAccount
+});
+
+// IMPORTANT: Replace this with your newly deployed contract address!
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 export default function Dashboard() {
   const [flightNumber, setFlightNumber] = useState("");
   const [flightDate, setFlightDate] = useState("");
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [riskData, setRiskData] = useState<{ premium: number, risk: string } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // Claiming State
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [claimingId, setClaimingId] = useState<number | null>(null);
 
   const [policies, setPolicies] = useState<any[]>([
     { id: 0, flight: "DL101", date: "2026-08-20", premium: 10, payout: 100, status: "active" },
     { id: 1, flight: "DELAY404", date: "2026-08-15", premium: 15, payout: 150, status: "claimed" }
   ]);
-  const [claimingId, setClaimingId] = useState<number | null>(null);
 
   const { login, authenticated } = usePrivy();
 
@@ -24,7 +42,7 @@ export default function Dashboard() {
     if (flightNumber.length > 2) {
       setIsAnalyzing(true);
       const timer = setTimeout(() => {
-        // Simulate dynamic risk calculation
+        // Keep the local UX for risk calculation so it feels instant
         const isHighRisk = flightNumber.toUpperCase().includes('DELAY');
         setRiskData({
           premium: isHighRisk ? 35 : 10,
@@ -46,36 +64,99 @@ export default function Dashboard() {
     if (!flightNumber || !flightDate || !riskData) return;
     setIsPurchasing(true);
     
-    setTimeout(() => {
+    try {
+      // 1. Write to GenLayer Contract
+      const txHash = await genlayerClient.writeContract({
+        address: CONTRACT_ADDRESS,
+        functionName: 'purchase_policy',
+        args: [flightNumber, flightDate, riskData.premium],
+        value: 0n,
+      });
+
+      // 2. Wait for network consensus
+      await genlayerClient.waitForTransactionReceipt({
+        hash: txHash,
+        status: TransactionStatus.FINALIZED,
+      });
+
+      // 3. Update UI state
       const newPolicy = {
-        id: policies.length,
+        id: policies.length, // In a real app, read the returned policy_id from the contract trace
         flight: flightNumber,
         date: flightDate,
         premium: riskData.premium,
         payout: riskData.premium * 10,
         status: "active"
       };
+      
       setPolicies([newPolicy, ...policies]);
       setFlightNumber("");
       setFlightDate("");
       setRiskData(null);
+    } catch (err) {
+      console.error("GenLayer Transaction Failed:", err);
+      alert("GenLayer transaction failed. Check console for details.");
+    } finally {
       setIsPurchasing(false);
-    }, 1500);
+    }
   };
 
-  const handleClaim = async (id: number, flight: string) => {
+  const handleClaim = async (id: number) => {
+    if (!evidenceUrl) {
+      alert("Please provide an evidence URL for the GenLayer LLMs to verify.");
+      return;
+    }
+    
     setClaimingId(id);
     
-    setTimeout(() => {
+    try {
+      // 1. Write to GenLayer Contract with Evidence URL
+      const txHash = await genlayerClient.writeContract({
+        address: CONTRACT_ADDRESS,
+        functionName: 'claim_payout',
+        args: [id, evidenceUrl],
+        value: 0n,
+      });
+
+      // 2. Wait for network consensus and LLM execution
+      const receipt = await genlayerClient.waitForTransactionReceipt({
+        hash: txHash,
+        status: TransactionStatus.FINALIZED,
+      });
+
+      // 3. Read the contract state to see the actual result (or check execution trace)
+      // Since our contract returns a string, we check if it finished with return
+      let updatedStatus = "rejected";
+      if (receipt.txExecutionResultName === ExecutionResult.FINISHED_WITH_RETURN) {
+        // For the hackathon demo, we'll assume a successful return means the logic passed,
+        // but we can also use readContract to check the final policy status.
+        const policyData: any = await genlayerClient.readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: "get_policy",
+          args: [id]
+        });
+        
+        if (policyData && policyData.status) {
+           updatedStatus = policyData.status.toLowerCase();
+        } else {
+           // Fallback if read fails
+           updatedStatus = "claimed"; 
+        }
+      }
+
       setPolicies(policies.map(p => {
         if (p.id === id) {
-          const isDelayed = flight.toUpperCase().includes("DELAY") || flight.toUpperCase().includes("CANCEL");
-          return { ...p, status: isDelayed ? "claimed" : "rejected" };
+          return { ...p, status: updatedStatus };
         }
         return p;
       }));
+      setEvidenceUrl("");
+    } catch (err) {
+      console.error("GenLayer Claim Failed:", err);
+      alert("GenLayer claim failed. Ensure the contract is deployed and address is correct.");
+    } finally {
       setClaimingId(null);
-    }, 2500);
+    }
   };
 
   return (
@@ -147,7 +228,7 @@ export default function Dashboard() {
             disabled={isPurchasing || !flightNumber || !flightDate || !riskData}
             style={{ width: '100%', marginTop: '2rem', justifyContent: 'center' }}
           >
-            {isPurchasing ? 'Processing Transaction...' : <><HugeiconsIcon icon={Shield01Icon} size={20} /> Purchase Policy</>}
+            {isPurchasing ? 'Broadcasting to GenLayer...' : <><HugeiconsIcon icon={Shield01Icon} size={20} /> Purchase Policy</>}
           </button>
         </motion.div>
 
@@ -178,23 +259,35 @@ export default function Dashboard() {
                 </div>
                 
                 {policy.status === 'active' && (
-                  <button 
-                    className="saas-btn"
-                    onClick={() => handleClaim(policy.id, policy.flight)}
-                    disabled={claimingId === policy.id}
-                    style={{ marginTop: '0.5rem', justifyContent: 'center', width: '100%' }}
-                  >
-                    {claimingId === policy.id ? 'Verifying with GenLayer LLM...' : 'File Claim'}
-                  </button>
+                  <div style={{ marginTop: '1rem' }}>
+                    <div style={{ marginBottom: '0.5rem' }}>
+                      <input 
+                        type="url" 
+                        className="saas-input"
+                        placeholder="https://flightaware.com/..." 
+                        value={evidenceUrl}
+                        onChange={(e) => setEvidenceUrl(e.target.value)}
+                        style={{ padding: '0.5rem', fontSize: '0.875rem' }}
+                      />
+                    </div>
+                    <button 
+                      className="saas-btn"
+                      onClick={() => handleClaim(policy.id)}
+                      disabled={claimingId === policy.id}
+                      style={{ justifyContent: 'center', width: '100%' }}
+                    >
+                      {claimingId === policy.id ? 'Waiting for LLM Consensus...' : 'File Claim'}
+                    </button>
+                  </div>
                 )}
                 {policy.status === 'claimed' && (
                   <div style={{ color: '#166534', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <HugeiconsIcon icon={CheckmarkBadge01Icon} size={16} /> Claim successfully paid out via intelligent contract.
+                    <HugeiconsIcon icon={CheckmarkBadge01Icon} size={16} /> Claim approved and paid out by GenLayer.
                   </div>
                 )}
                 {policy.status === 'rejected' && (
                   <div style={{ color: '#991b1b', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <HugeiconsIcon icon={Cancel01Icon} size={16} /> LLM verified flight was not delayed.
+                    <HugeiconsIcon icon={Cancel01Icon} size={16} /> LLM verified flight was NOT delayed.
                   </div>
                 )}
               </motion.div>

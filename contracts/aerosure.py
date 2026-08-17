@@ -25,7 +25,7 @@ class AeroSureContract(gl.Contract):
         return policy_id
 
     @gl.public.write
-    def claim_payout(self, policy_id: int):
+    def claim_payout(self, policy_id: int, evidence_url: str):
         if policy_id not in self.policies:
             return "ERROR: Policy does not exist"
         
@@ -35,12 +35,12 @@ class AeroSureContract(gl.Contract):
 
         # This inner function captures outer variables to format the prompt input
         def get_input() -> str:
-            return f"Flight Number: {policy['flight_number']}\nDate: {policy['flight_date']}"
+            return f"Flight Number: {policy['flight_number']}\nDate: {policy['flight_date']}\nSource Evidence URL: {evidence_url}"
 
         # GenLayer network consensus for LLM non-determinism
         decision = gl.eq_principle.prompt_non_comparative(
             get_input,
-            task="Search the web and analyze if this flight was delayed for more than 2 hours or canceled.",
+            task="Navigate to the provided Source Evidence URL to verify the flight status. Determine if this flight was delayed for more than 2 hours or canceled based on the evidence.",
             criteria="The response must be exactly one word: DELAYED or ON_TIME.",
         )
 
