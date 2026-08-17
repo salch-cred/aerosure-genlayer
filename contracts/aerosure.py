@@ -63,3 +63,10 @@ class AeroSureContract(gl.Contract):
         if policy_id in self.policies:
             return self.policies[policy_id]
         return None
+
+    @gl.public.view
+    def get_all_policies(self):
+        """
+        Added this method so the React frontend can fetch and display all policies on the Dashboard feed!
+        """
+        return self.policies

@@ -16,8 +16,8 @@ const genlayerClient = createClient({
   account: genlayerAccount
 });
 
-// IMPORTANT: Replace this with your newly deployed contract address!
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+// Replace this with your newly deployed contract address!
+const CONTRACT_ADDRESS = "0x4c24016B6298AB9eC69A56304aE3E832641B9C1e";
 
 export default function Dashboard() {
   const [flightNumber, setFlightNumber] = useState("");
@@ -30,12 +30,41 @@ export default function Dashboard() {
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [claimingId, setClaimingId] = useState<number | null>(null);
 
-  const [policies, setPolicies] = useState<any[]>([
-    { id: 0, flight: "DL101", date: "2026-08-20", premium: 10, payout: 100, status: "active" },
-    { id: 1, flight: "DELAY404", date: "2026-08-15", premium: 15, payout: 150, status: "claimed" }
-  ]);
+  const [policies, setPolicies] = useState<any[]>([]);
+  const [isLoadingPolicies, setIsLoadingPolicies] = useState(true);
 
   const { login, authenticated } = usePrivy();
+
+  // Fetch Policies on Load
+  useEffect(() => {
+    async function fetchPolicies() {
+      try {
+        const policiesData: any = await genlayerClient.readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: "get_all_policies",
+          args: []
+        });
+        
+        if (policiesData) {
+          // Convert dictionary { "1": {...} } to an array and reverse for newest first
+          const policiesArray = Object.entries(policiesData).map(([id, p]: [string, any]) => ({
+            id: Number(id),
+            flight: p.flight_number,
+            date: p.flight_date,
+            premium: p.premium,
+            payout: p.payout,
+            status: p.status.toLowerCase()
+          })).reverse();
+          setPolicies(policiesArray);
+        }
+      } catch (err) {
+        console.error("Failed to fetch policies:", err);
+      } finally {
+        setIsLoadingPolicies(false);
+      }
+    }
+    fetchPolicies();
+  }, []);
 
   // Dynamic Risk Analysis Effect
   useEffect(() => {
@@ -240,7 +269,11 @@ export default function Dashboard() {
         >
           <h2 style={{ marginBottom: '2rem' }}>Active Policies</h2>
           <div className="policy-list">
-            {policies.map((policy, index) => (
+            {isLoadingPolicies ? (
+              <div style={{ color: 'var(--text-muted)' }}>Fetching from GenLayer...</div>
+            ) : policies.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)' }}>No policies found.</div>
+            ) : policies.map((policy, index) => (
               <motion.div 
                 key={policy.id} 
                 className="policy-card"
